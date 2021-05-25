@@ -83,14 +83,50 @@ public class FXMLController {
     	for(RegistaNumero rn: model.getAffini(dir)) {
     		txtResult.appendText("\n" + rn.toString());
     	}
+    	
+    	this.txtAttoriCondivisi.setDisable(false);
+    	this.btnCercaAffini.setDisable(false);
     }
 
     @FXML
     void doRicorsione(ActionEvent event) {
 
+    	txtResult.clear();
+    	
+    	if(!isValid()) {
+    		return;
+    	}
+    	
+    	Director dir = this.boxRegista.getValue();
+    	int c = Integer.parseInt(this.txtAttoriCondivisi.getText());
+    	
+    	txtResult.appendText("LISTA REGISTI ASSOCIATI A: " + dir );
+    	
+    	for(Director d: model.getPercorso(dir, c)) {
+    		txtResult.appendText("\n" + d);
+    	}
+    	
+    	txtResult.appendText("\n\nTOTALE ATTORI = " + model.getNAttori());
     }
 
-    @FXML // This method is called by the FXMLLoader when initialization is complete
+    private boolean isValid() {
+		String input = this.txtAttoriCondivisi.getText();
+		
+		if(input == null) {
+			txtResult.appendText("ERRORE: inserire un numero di attori.");
+			return false;
+		}else {
+			try {
+				Integer.parseInt(input);
+			}catch(NumberFormatException nfe) {
+				txtResult.appendText("ERRORE: inserire un numero intero non una stringa");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         assert btnCreaGrafo != null : "fx:id=\"btnCreaGrafo\" was not injected: check your FXML file 'Scene.fxml'.";
         assert btnAdiacenti != null : "fx:id=\"btnAdiacenti\" was not injected: check your FXML file 'Scene.fxml'.";

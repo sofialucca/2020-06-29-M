@@ -3,6 +3,7 @@ package it.polito.tdp.imdb.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ public class Model {
 	private ImdbDAO dao;
 	private Map<Integer,Director> idMap;
 	private Graph<Director,DefaultWeightedEdge> grafo;
+	private List<Director> risultato;
+	private int costoOttimale;
 	
 	public Model() {
 		dao = new ImdbDAO();
@@ -62,5 +65,57 @@ public class Model {
 	
 	public int getSizeEdge() {
 		return grafo.edgeSet().size();
+	}
+	
+	public List<Director> getPercorso(Director partenza, int c){
+		risultato = new ArrayList<>();
+		costoOttimale = 0;
+		List<Director> parziale = new ArrayList<Director>();
+		parziale.add(partenza);
+		ricerca(parziale,this.getAffini(partenza) , c, 0);
+		return risultato;
+	}
+
+	private void ricerca(List<Director> parziale, List<RegistaNumero> riferimento, int c, int costoCammino) {
+		if(costoCammino > c) {
+			return;
+		}
+		
+		if(costoCammino > costoOttimale) {
+			costoOttimale = costoCammino;
+			risultato = new ArrayList<>(parziale);
+			if(costoCammino == c) {
+				return;
+			}
+			System.out.println(risultato);
+			System.out.println(costoOttimale);
+		}
+		
+		if(riferimento.isEmpty()) {
+			return;
+		}
+		
+		for(RegistaNumero rn: riferimento) {
+			Director dir = rn.getDir();
+			if(!parziale.contains(dir)){
+				parziale.add(dir);
+				ricerca(parziale, this.getAffini(dir), c, (int) (costoCammino + rn.getnAttori()));
+				parziale.remove(dir);				
+			}
+
+		}
+	}
+	
+	public int getNAttori() {
+		return costoOttimale;
+	}
+
+	private int costoCammino(List<Director> parziale) {
+		int costo = 0;
+		for(int i = 0; i<parziale.size()-1; i++) {
+			DefaultWeightedEdge e = grafo.getEdge(parziale.get(i), parziale.get(i+1));
+			costo += (int) grafo.getEdgeWeight(e); 
+		}
+		return costo;
 	}
 }

@@ -9,6 +9,9 @@ public class TestModel {
 		m.creaGrafo(2005);
 		
 		System.out.println(m.getAffini(new Director(498,"Keith", "Adler")));
+		
+		System.out.println(m.getPercorso(new Director(498,"Keith", "Adler"), 8));
+		System.out.println(m.getNAttori());
 	}
 
 }
